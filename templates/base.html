@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livestock Disease Prediction</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Simple Clean Theme */
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --main-bg: #f8fafc;
+            --card-bg: #FFFFFF;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--main-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background: #FFFFFF;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-primary) !important;
+        }
+
+        .nav-link {
+            color: var(--text-secondary) !important;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            color: #FFFFFF;
+        }
+
+        .btn-light {
+            background: #f1f5f9;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-light:hover {
+            background: #e2e8f0;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            color: var(--text-primary);
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: var(--main-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem 0;
+        }
+
+        .footer {
+            background: #f1f5f9;
+            padding: 2rem 0;
+            margin-top: auto;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .form-control,
+        .form-select {
+            background-color: #FFFFFF;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .dropdown-menu {
+            background-color: #FFFFFF;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown-item {
+            color: var(--text-primary);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--main-bg);
+        }
+
+        .alert {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        /* Premium Fullscreen Glassmorphic Loader Overlay - Theme Matched */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(248, 250, 252, 0.88); /* High quality light slate matching app background */
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #loading-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .loader-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1.5px solid rgba(37, 99, 235, 0.15); /* Primary color matching border */
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            width: 90%;
+            max-width: 520px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15),
+                        0 0 40px rgba(37, 99, 235, 0.04);
+            color: var(--text-primary);
+            transform: scale(0.9);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        #loading-overlay.active .loader-card {
+            transform: scale(1);
+        }
+
+        .loader-icon-container {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 1.75rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loader-pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid rgba(37, 99, 235, 0.08);
+            border-top-color: var(--primary-color); /* Blue */
+            border-bottom-color: #10b981; /* Emerald Green */
+            border-radius: 50%;
+            animation: loader-spin 1.4s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.08);
+        }
+
+        @keyframes loader-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-icon {
+            font-size: 2.25rem;
+            color: var(--primary-color);
+            filter: drop-shadow(0 4px 6px rgba(37, 99, 235, 0.15));
+            animation: icon-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes icon-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .progress-percentage {
+            font-weight: 700;
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, var(--primary-color), #10b981); /* Match CliniPaws theme colors */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+
+        .progress-container {
+            background: #e2e8f0;
+            border-radius: 100px;
+            height: 12px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(15, 23, 42, 0.05);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-color), #3b82f6, #10b981, #059669); /* Rich Blue to Emerald Green */
+            background-size: 300% 100%;
+            border-radius: 100px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: width 0.3s cubic-bezier(0.1, 0.8, 0.25, 1);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+            animation: gradient-shimmer 2s linear infinite;
+        }
+
+        @keyframes gradient-shimmer {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+
+        #loader-title {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.3px;
+        }
+
+        #loader-message {
+            font-size: 0.95rem;
+            color: var(--text-secondary) !important;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.6;
+        }
+
+        .text-muted-custom {
+            color: var(--text-muted) !important;
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+
+        #loading-overlay .text-info {
+            color: #0284c7 !important; /* Elegant high-contrast medium-dark sky blue for Urdu texts */
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'dashboard' %}">
+                <i class="fas fa-paw me-2"></i>CliniPaws
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    {% if user.is_authenticated %}
+                    {% if user.role == 'doctor' or user.role == 'student' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chat' %}">
+                            <i class="fas fa-robot me-1"></i> AI Chat
+                        </a>
+                    </li>
+
+                    {% endif %}
+
+                    {% if user.is_superuser or user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin_messages' %}">
+                            <i class="fas fa-inbox me-1"></i> Messages
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><span class="dropdown-item-text text-muted small">
+                                    {% if user.is_superuser %}Admin{% else %}{{ user.role|title }}{% endif %}
+                                </span></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <form action="{% url 'logout' %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-success px-4 rounded-pill ms-2" href="{% url 'about' %}">About</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-primary px-4 rounded-pill" href="{% url 'signup' %}">Sign Up</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-success px-4 rounded-pill ms-2" href="{% url 'about' %}">About</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content {% block container_class %}container{% endblock %}">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-0">&copy; {% now "Y" %} CliniPaws. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Fullscreen Glassmorphic Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loader-card">
+            <div class="loader-icon-container">
+                <div class="loader-pulse"></div>
+                <i class="fas fa-paw loader-icon" id="loader-status-icon"></i>
+            </div>
+            
+            <div class="progress-percentage" id="progress-text">0%</div>
+            
+            <div class="progress-container">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+            </div>
+            
+            <h4 id="loader-title">Analyzing Request</h4>
+            <div id="loader-message">Please wait, connecting with our diagnostic models...</div>
+            
+            <div class="mt-4 text-muted-custom">
+                <i class="fas fa-info-circle me-1"></i> Running advanced diagnostic models. Do not refresh or close this page.
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const symptomForm = document.getElementById('symptom-report-form');
+            const imageForm = document.getElementById('image-report-form');
+            
+            if (symptomForm || imageForm) {
+                const targetForm = symptomForm || imageForm;
+                const isSymptomPage = !!symptomForm;
+                
+                targetForm.addEventListener('submit', function(e) {
+                    // Check validation first (standard HTML5 validation)
+                    if (!targetForm.checkValidity()) {
+                        return; // Let the browser handle standard form validation
+                    }
+                    
+                    // Show overlay
+                    const overlay = document.getElementById('loading-overlay');
+                    const progressBar = document.getElementById('progress-bar');
+                    const progressText = document.getElementById('progress-text');
+                    const loaderTitle = document.getElementById('loader-title');
+                    const loaderMessage = document.getElementById('loader-message');
+                    const loaderIcon = document.getElementById('loader-status-icon');
+                    
+                    overlay.classList.add('active');
+                    document.body.style.overflow = 'hidden'; // Block scrolling
+                    
+                    // Customize based on page
+                    let messages = [];
+                    if (isSymptomPage) {
+                        loaderTitle.innerText = "Analyzing Symptoms";
+                        loaderIcon.className = "fas fa-stethoscope loader-icon";
+                        messages = [
+                            { progress: 10, text: "Initializing diagnostic engine... <br><span class='text-info'>تشخیصی نظام کا آغاز کیا جا رہا ہے...</span>" },
+                            { progress: 25, text: "Loading symptoms into Logistic Regression classifier... <br><span class='text-info'>علامات کا ڈیٹا بیس میں موازنہ جاری ہے...</span>" },
+                            { progress: 45, text: "Running machine learning calculations... <br><span class='text-info'>ماڈل کے تحت بیماری کا جائزہ لیا جا رہا ہے...</span>" },
+                            { progress: 65, text: "Connecting to AI server for Vet Consultation... <br><span class='text-info'>تفصیلی طبی رپورٹ کے لیے سرور سے رابطہ کیا جا رہا ہے...</span>" },
+                            { progress: 80, text: "Generating custom treatment recommendations... <br><span class='text-info'>علاج اور احتیاطی تدابیر تیار کی جا رہی ہیں...</span>" },
+                            { progress: 92, text: "Finalizing and preparing report layout... <br><span class='text-info'>حتمی رپورٹ کو پی ڈی ایف اور ڈیٹا بیس میں محفوظ کیا جا رہا ہے...</span>" }
+                        ];
+                    } else {
+                        loaderTitle.innerText = "Analyzing Animal Skin Image";
+                        loaderIcon.className = "fas fa-camera loader-icon";
+                        messages = [
+                            { progress: 10, text: "Uploading animal image to AI engine... <br><span class='text-info'>تصویر سرور پر اپ لوڈ کی جا رہی ہے...</span>" },
+                            { progress: 25, text: "Initializing Roboflow Skin Disease Detector... <br><span class='text-info'>روبوفلو اسکن ڈیٹیکٹر کا آغاز کیا جا رہا ہے...</span>" },
+                            { progress: 45, text: "Processing image pixels & running deep learning filters... <br><span class='text-info'>امیج پکسلز کا گہرا تجزیہ جاری ہے...</span>" },
+                            { progress: 60, text: "Identifying skin lesions and computing confidence values... <br><span class='text-info'>جلد کی بیماری اور اس کے فیصد کا تعین کیا جا رہا ہے...</span>" },
+                            { progress: 75, text: "Consulting AI Veterinary database... <br><span class='text-info'>علاج کی تجاویز کے لیے اے آئی سے مشورہ جاری ہے...</span>" },
+                            { progress: 88, text: "Generating illustrated disease prediction report... <br><span class='text-info'>طبی رپورٹ اور احتیاطی تدابیر کی تیاری...</span>" },
+                            { progress: 95, text: "Rendering high-precision results... <br><span class='text-info'>رپورٹ فائنل کی جا رہی ہے، بس چند لمحات...</span>" }
+                        ];
+                    }
+                    
+                    let currentProgress = 0;
+                    let messageIndex = 0;
+                    
+                    // Function to update progress smoothly
+                    function updateProgress() {
+                        if (currentProgress < 95) {
+                            // Tapered progression logic:
+                            // Increments slower as it approaches 95%
+                            let increment = 1;
+                            if (currentProgress < 30) {
+                                increment = Math.random() * 4 + 2; // Fast start
+                            } else if (currentProgress < 60) {
+                                increment = Math.random() * 2 + 1; // Normal speed
+                            } else if (currentProgress < 85) {
+                                increment = Math.random() * 1 + 0.3; // Slower
+                            } else {
+                                increment = Math.random() * 0.15 + 0.05; // Crawl
+                            }
+                            
+                            currentProgress = Math.min(95, currentProgress + increment);
+                            const roundedProgress = Math.floor(currentProgress);
+                            progressBar.style.width = roundedProgress + '%';
+                            progressText.innerText = roundedProgress + '%';
+                            
+                            // Dynamic message rotation based on progress thresholds
+                            if (messageIndex < messages.length - 1 && roundedProgress >= messages[messageIndex + 1].progress) {
+                                messageIndex++;
+                                loaderMessage.innerHTML = messages[messageIndex].text;
+                            }
+                        }
+                    }
+                    
+                    // Set initial message
+                    loaderMessage.innerHTML = messages[0].text;
+                    
+                    // Start progression loop
+                    const progressInterval = setInterval(updateProgress, 80);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
