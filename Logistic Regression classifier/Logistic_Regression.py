@@ -54,6 +54,7 @@ def check_rule_based_overrides(symptoms):
     """
     # Normalize symptoms: lowercase and strip
     symptoms = [s.lower().strip() for s in symptoms if s]
+    
     symptoms_text = " ".join(symptoms)
     
     # Rule 1: Lumpy Skin Disease (LSD)
