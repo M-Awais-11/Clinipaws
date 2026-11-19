@@ -61,6 +61,7 @@ def train_and_save_model():
         return
 
     data = pd.read_csv(csv_path)
+    
     print(f"Loaded dataset with {len(data)} rows")
 
     # Create text representations
